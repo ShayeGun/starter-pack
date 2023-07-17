@@ -6,12 +6,12 @@ import { checkEnvVar } from './utils/check-environment-variables';
 env.config({ path: `${__dirname}/.env` });
 
 // environment variables check
-checkEnvVar('PORT', 'TOKEN_URL', 'SERVER_ADDRESS', 'JWT_SECRET', 'MONGODB_URL', 'JWT_EXPIRES_AT')
+checkEnvVar('PORT', 'BASE_URL', 'CUSTOMER_CODE', 'NATIONAL_CODE', 'PROFILE_NAME', 'CA_NAME', 'JWT_SECRET', 'MONGODB_URL', 'JWT_EXPIRES_AT')
 
 mongoose.connect(process.env.MONGODB_URL!).then(() => {
-    console.log('Shayrad MongoDB connected');
+    console.log('Pendar MongoDB connected');
 }).catch((err) => {
-    console.error('Shayrad MongoDB connection error', err);
+    console.error('Pendar MongoDB connection error', err);
 });
 
 const port = process.env.PORT || 7890;

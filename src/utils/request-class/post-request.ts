@@ -4,20 +4,22 @@ import { ApiRequest, Methods } from "./api-request";
 interface IPostRequest {
     method: Methods.post,
     url: string
-    header: {}
-    params?: {}
-    data?: {}
+    header: Record<string, string>
+    params?: Record<string, string>
+    data?: Record<string, any>
 }
 
 const header = {
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Accept-Encoding': 'UTF8',
+    'Content-Encoding': 'UTF8',
+    'Content-Type': 'application/json'
 }
 
 class PostRequest extends ApiRequest<IPostRequest> {
 
     method: IPostRequest["method"] = Methods.post
     url: IPostRequest['url']
-    header: IPostRequest['header'] = header;
+    header: IPostRequest['header'] = header
     private params?: IPostRequest['params']
     private data?: IPostRequest['data']
 
@@ -27,12 +29,19 @@ class PostRequest extends ApiRequest<IPostRequest> {
         if (params) this.params = params
     }
 
-    body(body: IPostRequest['data']) {
+    setBody(body: IPostRequest['data']) {
         if (!body) {
             this.data = {}
             return this
         }
         this.data = body
+        return this
+    }
+
+    // FIX:
+    setHeader(header: IPostRequest['header']) {
+        this.header = header
+
         return this
     }
 
