@@ -11,7 +11,6 @@ const signup = async (req: Request, res: Response, next: NextFunction) => {
     // validation of user input
     await userSchema.validateAsync(req.body);
 
-
     const user = new User(req.body);
     await user.save()
 

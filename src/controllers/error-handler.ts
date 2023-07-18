@@ -9,7 +9,7 @@ const sendError = (err: CustomError | Error, res: Response) => {
     else {
         console.log(err);
         console.log(Object.keys(err));
-        // console.log(err.name);
+        console.log(err.name);
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -20,8 +20,14 @@ function handleDuplicateFieldDB() {
     return new CustomError('Duplication of data', 400, 1101)
 }
 
-function handleDBValidation(err: any) {
-    return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1102)
+function handleValidation(err: any) {
+    // mongoose validation error (database-side)
+    if (err._message)
+        return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1102)
+
+    // joi validation error (server-side)
+    if (JSON.stringify(err._original) === '{}')
+        return new CustomError(err.message, 400, 1103)
 }
 
 function handleJWTError() {
@@ -35,8 +41,6 @@ function handleTokenExpired() {
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
     let error: any = err;
-    console.log(error);
-
 
     if (err.code === 11000) {
         error = handleDuplicateFieldDB();
@@ -44,7 +48,7 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
 
     if (error.name === 'ValidationError') {
-        error = handleDBValidation(err);
+        error = handleValidation(err);
     }
 
     if (error.name === 'JsonWebTokenError') {
