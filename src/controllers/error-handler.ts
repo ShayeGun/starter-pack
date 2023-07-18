@@ -8,6 +8,8 @@ const sendError = (err: CustomError | Error, res: Response) => {
     }
     else {
         console.log(err);
+        console.log(Object.keys(err));
+        // console.log(err.name);
 
         res.status(500).send('oh oh sth bad happened 😓')
 
@@ -18,7 +20,7 @@ function handleDuplicateFieldDB() {
     return new CustomError('Duplication of data', 400, 1101)
 }
 
-function handleValidation(err: any) {
+function handleDBValidation(err: any) {
     return new CustomError(`${err._message}: ${Object.keys(err.errors)}`, 400, 1102)
 }
 
@@ -33,14 +35,16 @@ function handleTokenExpired() {
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 
     let error: any = err;
+    console.log(error);
+
 
     if (err.code === 11000) {
         error = handleDuplicateFieldDB();
     }
 
 
-    if (error._message === 'User validation failed') {
-        error = handleValidation(err);
+    if (error.name === 'ValidationError') {
+        error = handleDBValidation(err);
     }
 
     if (error.name === 'JsonWebTokenError') {

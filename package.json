@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node ./src/server.ts",
     "test": "jest --watchAll --no-cache ./tests",
-    "joi": "ts-node ./src/utils/validator-user-input.ts",
+    "joi": "ts-node ./src/utils/validator-checker/validator-user-input.ts",
     "dev": "ts-node-dev --files --clear ./src/server.ts"
   },
   "jest": {

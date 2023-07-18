@@ -3,10 +3,15 @@ import { Request, Response, NextFunction } from 'express'
 import { User } from '../models/user'
 import { createSendToken, verifyJWT } from '../utils/jwt-handler'
 import { CustomError } from '../utils/custom-error'
+import { userSchema } from '../utils/validator-checker/user-signup-validator'
 
 env.config({ path: `${__dirname}/../../.env` })
 
 const signup = async (req: Request, res: Response, next: NextFunction) => {
+    // validation of user input
+    await userSchema.validateAsync(req.body);
+
+
     const user = new User(req.body);
     await user.save()
 
