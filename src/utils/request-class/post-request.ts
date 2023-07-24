@@ -4,24 +4,18 @@ import { ApiRequest, Methods } from "./api-request";
 interface IPostRequest {
     method: Methods.post,
     url: string
-    header: Record<string, string>
+    headers: Record<string, string>
     params?: Record<string, string>
-    data?: Record<string, any>
-}
-
-const header = {
-    'Accept-Encoding': 'UTF8',
-    'Content-Encoding': 'UTF8',
-    'Content-Type': 'application/json'
+    data: Record<string, any>
 }
 
 class PostRequest extends ApiRequest<IPostRequest> {
 
     method: IPostRequest["method"] = Methods.post
     url: IPostRequest['url']
-    header: IPostRequest['header'] = header
+    headers: IPostRequest['headers'] = {}
     private params?: IPostRequest['params']
-    private data?: IPostRequest['data']
+    private data: IPostRequest['data'] = {}
 
     constructor(url: IPostRequest['url'] = 'https://postman-echo.com/post', params?: IPostRequest['params']) {
         super();
@@ -29,18 +23,14 @@ class PostRequest extends ApiRequest<IPostRequest> {
         if (params) this.params = params
     }
 
-    setBody(body: IPostRequest['data']) {
-        if (!body) {
-            this.data = {}
-            return this
-        }
-        this.data = body
+    setBody(data: IPostRequest['data']) {
+        this.data = { ...this.data, ...data }
+
         return this
     }
 
-    // FIX:
-    setHeader(header: IPostRequest['header']) {
-        this.header = header
+    setHeader(header: IPostRequest['headers']) {
+        this.headers = { ...this.headers, ...header }
 
         return this
     }
@@ -49,11 +39,11 @@ class PostRequest extends ApiRequest<IPostRequest> {
         let requestConfig: IPostRequest = {
             url: this.url,
             method: this.method,
-            header: this.header,
+            headers: this.headers,
+            data: this.data
         }
 
         if (this.params) requestConfig.params = this.params
-        if (this.data) requestConfig.data = this.data
 
         const { data } = await axios(requestConfig)
 

@@ -70,4 +70,4 @@ class Token {
 
 const token = Token.build();
 
-export { token }
+export { Token, token }

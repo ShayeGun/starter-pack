@@ -4,21 +4,15 @@ import axios from "axios";
 interface IGetRequest {
     method: Methods.get,
     url: string
-    header: Record<string, string>
+    headers: Record<string, string>
     params?: Record<string, string>
-}
-
-const header = {
-    'Accept-Encoding': 'UTF8',
-    'Content-Encoding': 'UTF8',
-    'Content-Type': 'application/json'
 }
 
 class GetRequest extends ApiRequest<IGetRequest> {
 
     method: IGetRequest["method"] = Methods.get
     url: IGetRequest['url']
-    header: IGetRequest['header'] = header
+    headers: IGetRequest['headers'] = {}
     private params?: IGetRequest['params']
 
     constructor(url: IGetRequest['url'] = 'https://postman-echo.com/status/200', params?: IGetRequest['params']) {
@@ -27,9 +21,8 @@ class GetRequest extends ApiRequest<IGetRequest> {
         if (params) this.params = params
     }
 
-    // FIX:
-    setHeader(header: IGetRequest['header']) {
-        this.header = header
+    setHeader(header: IGetRequest['headers']) {
+        this.headers = { ...this.headers, ...header }
 
         return this
     }
@@ -38,7 +31,7 @@ class GetRequest extends ApiRequest<IGetRequest> {
         let requestConfig: IGetRequest = {
             url: this.url,
             method: this.method,
-            header: this.header,
+            headers: this.headers,
         }
 
         if (this.params) requestConfig.params = this.params
