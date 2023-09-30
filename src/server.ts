@@ -6,7 +6,7 @@ import { checkEnvVar } from './utils/check-environment-variables';
 env.config({ path: `${__dirname}/../.env` });
 
 // environment variables check
-checkEnvVar('PORT', 'T_USER', 'T_PASS', 'BASE_URL', 'MONGODB_URL', 'DBUSERNAME', 'PASSWORD', 'DATABASE', 'BUSINESS_ID', 'SUB_BUSINESS_ID');
+checkEnvVar('PORT', 'MONGODB_URL', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME', 'MONGODB_TEST_URL');
 
 mongoose.connect(process.env.MONGODB_URL!,
     {
@@ -15,9 +15,9 @@ mongoose.connect(process.env.MONGODB_URL!,
         dbName: process.env.DATABASE
     }
 ).then(() => {
-    console.log('Daap MongoDB connected');
+    console.log('MongoDB connected');
 }).catch((err) => {
-    console.error('Daap MongoDB connection error', err);
+    console.error('MongoDB connection error', err);
 });
 
 const port = process.env.PORT || 7892;

@@ -73,7 +73,7 @@ app.use('/api', limiter);
 
 // app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api/v1/', mainRouter);
+app.use('/api/v1', mainRouter);
 
 app.use('*', (req, res, next) => {
     return next(new CustomError('No Such URL Sry 🥲', 404, 404));
