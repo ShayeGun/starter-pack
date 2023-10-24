@@ -7,7 +7,7 @@ enum Roles {
 }
 
 interface IUser {
-    mobile: string;
+    phoneNumber: string;
     role: Roles;
 }
 
@@ -16,7 +16,7 @@ interface IUserMethods { }
 type UserModel = Model<IUser, {}, IUserMethods>;
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
-    mobile: {
+    phoneNumber: {
         type: String,
         required: true,
         maxlength: 11,
@@ -30,16 +30,20 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     }
 }, {
     toJSON: {
-        // not show __v , _id 
-        transform(doc, ret) {
+        // convert _id to id
+        virtuals: true,
+        // remove __v
+        versionKey: false,
+        // remove _id 
+        transform: function (doc, ret) {
             delete ret._id;
-            delete ret.__v;
+            // delete ret.__v;
         }
-    }
+    },
 });
 
 // searches are based on national-code and mobile-number
-userSchema.index({ nationalCode: 1, mobile: 1 }, { unique: true });
+userSchema.index({ phoneNumber: 1 }, { unique: true });
 
 const User = model<IUser, UserModel>('User', userSchema);
 

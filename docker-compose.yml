@@ -6,7 +6,19 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - dbdata6:/data/db
+      - ebapayDB:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=Shy
+      - MONGO_INITDB_ROOT_PASSWORD=Shy@720
+      - MONGO_INITDB_DATABASE=User
+
+  redis:
+    image: 'redis:bookworm'
+    command: redis-server
+    ports:
+      - '6379:6379'
+    volumes:
+      - ebapayDB:/data/db
 
 volumes:
-  dbdata6:
+  ebapayDB:
