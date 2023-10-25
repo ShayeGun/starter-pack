@@ -34,6 +34,9 @@ export const signup = catchAsync(async (req: Request, res: Response, next: NextF
     if (!existedOtp) return next(new CustomError('call this endpoint first /user/pre-register <POST>', 400, 101));
     if (existedOtp !== otp) return next(new CustomError('invalid otp', 400, 102));
 
+    // remove DDOS <I THINK O_o>
+    await redis.del(`OTP_${phoneNumber as string}`);
+
     const user = await User.findOne({ phoneNumber });
 
     const [accessToken, refreshToken] = createTokens(user);
