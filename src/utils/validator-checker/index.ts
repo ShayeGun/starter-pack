@@ -1,1 +1,1 @@
-export * from './user-update.validator';
+export * from './pre-register-user.validator';
