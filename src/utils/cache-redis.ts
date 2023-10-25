@@ -9,7 +9,7 @@ interface ICache {
     password: string;
 }
 
-export class CacheRedis extends Redis {
+class CacheRedis extends Redis {
     private static _instance: Redis;
 
     private constructor() {

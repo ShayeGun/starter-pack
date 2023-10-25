@@ -4,27 +4,44 @@ import { User } from "../models/user.model";
 import { redis } from "../utils/cache-redis";
 import { CustomError } from "../utils/custom-error";
 import { PostRequest } from "../utils/request-class/post-request";
+import { createTokens } from "../utils/jwt-tokens";
 
 export const preRegisterUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { phoneNumber } = req.body;
-    const user = await User.create({ phoneNumber });
-    res.json({ data: user });
-});
 
-export const cacheOtp = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const { phoneNumber } = req.query;
+    let user = await User.findOne({ phoneNumber });
+    if (!user) user = await User.create({ phoneNumber });
 
-    const existedOtp = await redis.get(phoneNumber as string);
-    if (existedOtp) return next(new CustomError('you have already requested for an otp', 400, 101));
+    const existedOtp = await redis.get(`OTP_${phoneNumber as string}`);
+    if (existedOtp) return next(new CustomError('you have already requested for an otp', 400, 100));
 
     const newOtp = generateRandomNumber(process.env.OTP_LENGTH!);
 
     const sms = await sendSms(phoneNumber as string, newOtp);
 
-    await redis.set(phoneNumber as string, newOtp, 'EX', +process.env.REDIS_TTL!);
+    await redis.set(`OTP_${phoneNumber as string}`, newOtp, 'EX', +process.env.REDIS_TTL!);
 
     res.json({ data: sms });
 });
+
+// TODO: what if the person rapidly send requests to this endpoint ???
+export const signup = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { phoneNumber, otp } = req.body;
+    const existedOtp = await redis.get(`OTP_${phoneNumber as string}`);
+
+    if (!existedOtp) return next(new CustomError('call this endpoint first /user/pre-register <POST>', 400, 101));
+    if (existedOtp !== otp) return next(new CustomError('invalid otp', 400, 102));
+
+    const user = await User.findOne({ phoneNumber });
+
+    const [accessToken, refreshToken] = createTokens(user);
+
+    res.json({ data: { accessToken, refreshToken } });
+});
+
+// =============================================================================
+// ============================= UTILITY FUNCTIONS =============================
+// =============================================================================
 
 async function sendSms(phoneNumber: string, message: string) {
     const otpRequest = new PostRequest(process.env.OTP_URL);

@@ -3,6 +3,15 @@ import env from 'dotenv';
 import mongoose from "mongoose";
 import { checkEnvVar } from './utils/check-environment-variables';
 
+// extend Request object fields for Express
+declare global {
+    namespace Express {
+        interface Request {
+            user?: any;
+        }
+    }
+}
+
 env.config({ path: `${__dirname}/../.env` });
 
 // environment variables check
