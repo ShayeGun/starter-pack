@@ -54,7 +54,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response, next:
     try {
         const data = verify(accessToken, process.env.ACCESS_TOKEN_SECRET!);
 
-        return res.json(data);
+        return res.json(accessToken);
 
     } catch (err: any) {
         if (err?.name === "TokenExpiredError") {
