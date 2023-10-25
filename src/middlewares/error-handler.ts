@@ -38,11 +38,11 @@ function handleValidation(err: any) {
 }
 
 function handleJWTError() {
-    return new CustomError('invalid token Please login!', 401, 1201);
+    return new CustomError('invalid token Please login!', 401, 110);
 }
 
 function handleTokenExpired() {
-    return new CustomError('token expired Please login again!', 401, 1202);
+    return new CustomError('token expired Please login again!', 401, 110);
 }
 
 function handleAxiosErrors(err: any) {

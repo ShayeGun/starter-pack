@@ -5,6 +5,8 @@ import { redis } from "../utils/cache-redis";
 import { CustomError } from "../utils/custom-error";
 import { PostRequest } from "../utils/request-class/post-request";
 import { createTokens } from "../utils/jwt-tokens";
+import { verify } from "jsonwebtoken";
+import { resetRefreshToken } from "../utils/refresh-token";
 
 export const preRegisterUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { phoneNumber } = req.body;
@@ -36,7 +38,29 @@ export const signup = catchAsync(async (req: Request, res: Response, next: NextF
 
     const [accessToken, refreshToken] = createTokens(user);
 
+    user!.refreshToken = refreshToken;
+    await user?.save();
+
     res.json({ data: { accessToken, refreshToken } });
+});
+
+export const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { refreshToken, accessToken, phoneNumber } = req.body;
+    const user = await User.findOne({ phoneNumber });
+    if (!user) return next(new CustomError('call this endpoint first /user/pre-register <POST>', 400, 101));
+    try {
+        const data = verify(accessToken, process.env.ACCESS_TOKEN_SECRET!);
+
+        return res.json(data! || "ok");
+
+    } catch (err: any) {
+        if (err?.name === "TokenExpiredError") {
+            const data = await resetRefreshToken(refreshToken, process.env.REFRESH_TOKEN_TOKEN_SECRET!, user);
+            return res.json({ data });
+        }
+        return next(new CustomError(err.message, 400, 110));
+    }
+
 });
 
 // =============================================================================

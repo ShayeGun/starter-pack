@@ -11,6 +11,9 @@ router.route('/user/pre-register')
 router.route('/user/signup')
     .post(genericValidator(Dto.SignupUserDto), AuthController.signup);
 
+router.route('/user/refresh')
+    .post(genericValidator(Dto.RefreshTokenDto), AuthController.refreshToken);
+
 router.route('/user/auth')
     .all(authUser, (req, res) => {
         res.json({

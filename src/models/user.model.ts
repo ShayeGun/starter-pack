@@ -6,12 +6,13 @@ enum Roles {
     admin = "admin"
 }
 
-interface IUser {
+export interface IUser {
     phoneNumber: string;
+    refreshToken?: string;
     role: Roles;
 }
 
-interface IUserMethods { }
+export interface IUserMethods { }
 
 type UserModel = Model<IUser, {}, IUserMethods>;
 
@@ -22,6 +23,9 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         maxlength: 11,
         minlength: 11,
         validate: [validator.isMobilePhone, 'not valid phone number']
+    },
+    refreshToken: {
+        type: String,
     },
     role: {
         type: String,
@@ -37,6 +41,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
         // remove _id 
         transform: function (doc, ret) {
             delete ret._id;
+            delete ret.refreshToken;
             // delete ret.__v;
         }
     },
