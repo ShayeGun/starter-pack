@@ -8,6 +8,8 @@ import { createTokens } from "../utils/jwt-tokens";
 import { verify } from "jsonwebtoken";
 import { resetRefreshToken } from "../utils/refresh-token";
 
+const ENV = process.argv[2];
+
 export const preRegisterUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const { phoneNumber } = req.body;
 
@@ -17,9 +19,8 @@ export const preRegisterUser = catchAsync(async (req: Request, res: Response, ne
     const existedOtp = await redis.get(`OTP_${phoneNumber as string}`);
     if (existedOtp) return next(new CustomError('you have already requested for an otp', 400, 100));
 
-    const newOtp = generateRandomNumber(process.env.OTP_LENGTH!);
-
-    const sms = await sendSms(phoneNumber as string, newOtp);
+    const newOtp = ENV === "production" ? generateRandomNumber(process.env.OTP_LENGTH!) : '1234';
+    const sms = ENV === "production" ? await sendSms(phoneNumber as string, newOtp) : { code: 999, msg: "testing" };
 
     await redis.set(`OTP_${phoneNumber as string}`, newOtp, 'EX', +process.env.REDIS_TTL!);
 
