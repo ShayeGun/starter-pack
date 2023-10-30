@@ -38,31 +38,25 @@ function handleValidation(err: any) {
 }
 
 function handleJWTError() {
-    return new CustomError('invalid token Please login!', 401, 1201);
+    return new CustomError('invalid token Please login!', 401, 110);
 }
 
 function handleTokenExpired() {
-    return new CustomError('token expired Please login again!', 401, 1202);
+    return new CustomError('token expired Please login again!', 401, 110);
 }
 
 function handleAxiosErrors(err: any) {
-    // inconsistency with daap error responses |-_-|
-    if (err.response.data.error) {
-        const error = err.response.data.error;
-        return new CustomError(error.message, error.code, error.code);
-    }
+    const errorHost = err.response.config.url;
 
-    else if (err.response.data) {
-        if (err.response.status === 502) {
-            return new CustomError("Daap is down please try again later...", err.response.status, err.response.status);
-        }
-
+    // error in otp service
+    if (errorHost === process.env.OTP_URL) {
         const error = err.response.data;
-        return new CustomError(error.message, error.status, error.status);
+        return new CustomError(error.msg, error.code, error.code);
     }
-    const error = err.response;
 
-    return new CustomError(`Daap ${error.statusText}`, error.status, error.status);
+    // couldn't customize error
+    console.log(err);
+    return err;
 }
 
 

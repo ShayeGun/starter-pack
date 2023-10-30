@@ -1,0 +1,212 @@
+definition:
+  openapi: 3.0.3
+  info:
+    title: EbaPay wallet
+    version: '1.0.0'
+    description: ebaPay is here baby )^_^)
+  schemes:
+    - http
+    - https
+  servers:
+    - url: http://localhost:3000/api/v1
+  tags:
+    - name: User
+      description: This is Auth microservice
+
+  paths:
+
+    /user/pre-register:
+      post:
+        tags:
+          - User
+        summary: request otp
+        description: call this endpoint to send an otp to the user
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/Pre-Register'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/Pre-Register'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/CustomError'
+
+    /user/signup:
+      post:
+        tags:
+          - User
+        summary: signup user
+        description: call this endpoint after /user/pre-register
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/SignUp'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/Tokens'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/CustomError'
+    
+    /user/refresh:
+      post:
+        tags:
+          - User
+        summary: refreshing access token and refresh token
+        description: |
+          for keep user signed in without  taking user to login page | 
+          call this end point after signing user up
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/requests/RefreshTokens'
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/Tokens'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/CustomError'
+
+    /user/auth:
+      get:
+        security:
+          - bearerAuth: []
+        tags:
+          - User
+        summary: checking user auth 
+        description: for auth testing purposes
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/Auth'
+          '400':
+            description: Failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/CustomError'
+
+  components:
+
+    securitySchemes:
+      bearerAuth:            # arbitrary name for the security scheme
+        type: http
+        scheme: bearer
+        bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+
+    requests:
+
+      Pre-Register:
+        type: object
+        properties:
+          phoneNumber:
+            type: string
+            required: true
+            example: '09xxxxxxxxx'
+      
+      SignUp:
+        type: object
+        properties:
+          phoneNumber:
+            type: string
+            required: true
+            example: '09xxxxxxxxx'
+          otp:
+            type: string
+            required: true
+            example: '1234'
+      
+      RefreshTokens:
+        type: object
+        properties:
+          phoneNumber:
+            type: string
+            required: true
+            example: '09xxxxxxxxx'
+          accessToken:
+            type: string
+          refreshToken:
+            type: string
+  
+    responses:
+    
+      Pre-Register:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              msg:
+                type: string
+                example: "message send"
+
+      # response to RefreshTokens + SignUp
+      Tokens:
+        type: object
+        properties:
+          data:
+            type: object
+            properties:
+              accessToken:
+                type: string
+              refreshToken:
+                type: string
+      
+      Auth:
+        type: object
+        properties:
+          data:
+            type: string
+            example: '<object> you are authenticated'
+
+      CustomError:
+        type: object
+        properties:
+          code:
+            type: string
+            required: true
+            example: '101'
+          status:
+            type: string
+            required: true
+            example: 'fail'
+          errMsg:
+            type: string
+            required: true
+
+apis:
+  - ./routes/*.ts

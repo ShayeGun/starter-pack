@@ -67,11 +67,11 @@ app.use('/api', limiter);
 //     next();
 // });
 
-// const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
+const options = yaml.load(fs.readFileSync(`${__dirname}/../swagger.yaml`, 'utf8'));
 
-// const swaggerSpec = swaggerJSDoc(options!);
+const swaggerSpec = swaggerJSDoc(options!);
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/v1', mainRouter);
 
