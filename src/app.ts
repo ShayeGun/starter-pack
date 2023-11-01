@@ -15,6 +15,8 @@ import yaml from 'js-yaml';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+const ENV = process.argv[2];
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -30,7 +32,10 @@ const limiter = rateLimit({
 });
 
 app.use(express.json({ limit: '10kb' }));
-app.use(helmet());
+app.use(helmet({
+    // because server is http not https right now and swagger won't render correctly
+    contentSecurityPolicy: ENV === "production" ? true : false
+}));
 app.use(cors());
 app.use(ExpressMongoSanitize());
 app.use('/api', limiter);
