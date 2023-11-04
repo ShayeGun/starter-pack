@@ -24,7 +24,7 @@ export const preRegisterUser = catchAsync(async (req: Request, res: Response, ne
 
     await redis.set(`OTP_${phoneNumber as string}`, newOtp, 'EX', +process.env.REDIS_TTL!);
 
-    res.json({ data: sms });
+    res.json({ response: sms });
 });
 
 // TODO: what if the person rapidly send requests to this endpoint ???
@@ -45,7 +45,7 @@ export const signup = catchAsync(async (req: Request, res: Response, next: NextF
     user!.refreshToken = refreshToken;
     await user?.save();
 
-    res.json({ data: { accessToken, refreshToken } });
+    res.json({ response: { accessToken, refreshToken } });
 });
 
 export const refreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -55,12 +55,12 @@ export const refreshToken = catchAsync(async (req: Request, res: Response, next:
     try {
         const data = verify(accessToken, process.env.ACCESS_TOKEN_SECRET!);
 
-        return res.json({ data: { accessToken, refreshToken: '' } });
+        return res.json({ response: { accessToken, refreshToken: '' } });
 
     } catch (err: any) {
         if (err?.name === "TokenExpiredError") {
-            const data = await resetRefreshToken(refreshToken, process.env.REFRESH_TOKEN_TOKEN_SECRET!, user);
-            return res.json({ data });
+            const response = await resetRefreshToken(refreshToken, process.env.REFRESH_TOKEN_TOKEN_SECRET!, user);
+            return res.json({ response });
         }
         return next(new CustomError(err.message, 400, 110));
     }
