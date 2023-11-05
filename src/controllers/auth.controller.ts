@@ -20,7 +20,7 @@ export const preRegisterUser = catchAsync(async (req: Request, res: Response, ne
     if (existedOtp) return next(new CustomError('you have already requested for an otp', 400, 100));
 
     const newOtp = ENV === "production" ? generateRandomNumber(process.env.OTP_LENGTH!) : '1234';
-    const sms = ENV === "production" ? await sendSms(phoneNumber as string, newOtp) : { code: 999, msg: "testing" };
+    const sms = ENV === "production" ? await sendSms(phoneNumber as string, newOtp) : { code: 200, msg: "testing" };
 
     await redis.set(`OTP_${phoneNumber as string}`, newOtp, 'EX', +process.env.REDIS_TTL!);
 
