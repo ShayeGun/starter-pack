@@ -31,7 +31,7 @@ class PatchRequest extends ApiRequest<IPatchRequest> {
         // default headers
         if (token) {
             const t = token.getToken();
-            this.headers = { "Authorization": `${t.tokenType} ${t.accessToken}` };
+            this.headers = { ...this.headers, "Authorization": `${t.tokenType} ${t.accessToken}` };
         }
     }
 
